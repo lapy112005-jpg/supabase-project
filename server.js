@@ -24,6 +24,7 @@ app.post("/signup", async (req, res, next) => {
     options: {
       data: { phone },
     },
+    
   });
   if (error) {
     return res.status(401).json({ error: error.message });
