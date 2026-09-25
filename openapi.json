@@ -1,0 +1,113 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Authentication API - Supabase",
+    "version": "1.0.0",
+    "description": "Hands-on JWT authentication lifecycle with Supabase & Express"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Local Development Server"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Enter your Supabase access_token here"
+      }
+    }
+  },
+  "paths": {
+    "/signup": {
+      "post": {
+        "summary": "Register a new user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password"],
+                "properties": {
+                  "email": { "type": "string", "example": "user@example.com" },
+                  "password": { "type": "string", "example": "password123" },
+                  "phone": { "type": "string", "example": "123456789" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "User created successfully" },
+          "400": { "description": "Missing email/password" },
+          "401": { "description": "Signup error" }
+        }
+      }
+    },
+    "/login": {
+      "post": {
+        "summary": "Log in an existing user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password"],
+                "properties": {
+                  "email": { "type": "string", "example": "user@example.com" },
+                  "password": { "type": "string", "example": "password123" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Login successful, returns tokens" },
+          "400": { "description": "Missing credentials" },
+          "401": { "description": "Invalid login credentials" }
+        }
+      }
+    },
+    "/public/info": {
+      "get": {
+        "summary": "Public route accessible by anyone",
+        "responses": {
+          "200": { "description": "Welcome message" }
+        }
+      }
+    },
+    "/profile": {
+      "get": {
+        "summary": "Get user profile (Protected)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": { "description": "Profile retrieved successfully" },
+          "401": { "description": "Access token required or invalid" }
+        }
+      }
+    },
+    "/logout": {
+      "post": {
+        "summary": "Log out current user session (Protected)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": { "description": "Logged out successfully" },
+          "401": { "description": "Unauthorized" }
+        }
+      }
+    }
+  }
+}

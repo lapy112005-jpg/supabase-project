@@ -2,6 +2,8 @@ import express from "express";
 import dotenv from "dotenv";
 import { createClient } from "@supabase/supabase-js";
 import { requireAuth } from "./middleware/auth.middleware.js";
+import swaggerUi from "swagger-ui-express";
+import fs from "fs";
 const app = express();
 
 dotenv.config();
@@ -9,7 +11,9 @@ app.use(express.json());
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
 export const supabase = createClient(supabaseUrl, supabaseKey);
+const openapiDocument = JSON.parse(fs.readFileSync("./openapi.json", "utf-8"));
 
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(openapiDocument));
 app.get("/", (req, res, next) => {
   res.send("lololol");
 });
