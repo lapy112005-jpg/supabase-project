@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import { createClient } from "@supabase/supabase-js";
+import { requireAuth } from "./middleware/auth.middleware.js";
 const app = express();
 
 dotenv.config();
@@ -24,7 +25,7 @@ app.post("/signup", async (req, res, next) => {
     options: {
       data: { phone },
     },
-    
+
   });
   if (error) {
     return res.status(401).json({ error: error.message });
@@ -47,7 +48,7 @@ app.post("/login", async (req, res, next) => {
   if (!data.session) {
     return res.status(401).json({ message: "Invalid login credentials" });
   }
-
+  
   return res.status(201).json(data);
 });
 
@@ -57,17 +58,20 @@ app.get("/public/info", (req, res) => {
   });
 });
 
-app.get("/profile", async (req, res, next) => {
-  const token = req.headers.authorization;
-  if (!token) {
-    return res.status(401).json({ error: "Access token required" });
-  }
-  const { data, error } = await supabase.auth.getUser(token);
-  if (error) {
-    return res.status(401).json({ error: error.message });
-  }
-  res.json({data})
+app.get("/profile",requireAuth, async (req, res, next) => {
+  res.json({users:req.user})
 });
+
+
+app.post("/logout",requireAuth, async (req, res, next) => {
+  const {data , error} = await supabase.auth.signOut()
+  if (error) {
+    return res.status(400).json({ error: error.message });
+  }
+  return res.json(data)
+});
+
+
 app.listen(process.env.PORT, () => {
   console.log("server running");
 });
